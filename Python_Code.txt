@@ -1,4 +1,5 @@
 import datetime
+<<<<<<< HEAD
 from typing import Optional
 
 class SmartGreeter:
@@ -71,4 +72,42 @@ def main():
     print("="*30)
 
 if __name__ == "__main__":
+=======
+
+def get_time_based_greeting():
+    """Возвращает приветствие в зависимости от времени суток."""
+    hour = datetime.datetime.now().hour
+    if 5 <= hour < 12:
+        return "Доброе утро"
+    elif 12 <= hour < 18:
+        return "Добрый день"
+    elif 18 <= hour < 23:
+        return "Добрый вечер"
+    else:
+        return "Доброй ночи"
+
+def greet_user():
+    """Функция приветствия пользователя с учетом времени суток."""
+    time_greeting = get_time_based_greeting()
+    print(f"{time_greeting}! Эта программа умеет здороваться.")
+    
+    user_name = input("Как тебя зовут? ").strip()
+    
+    if not user_name:
+        print(f"{time_greeting}, аноним! Добро пожаловать!")
+        return
+        
+    print(f"{time_greeting}, {user_name}! Добро пожаловать!")
+    
+    current_time = datetime.datetime.now().strftime("%H:%M")
+    print(f"Текущее время: {current_time}")
+
+def main():
+    """Основная функция программы."""
+    print("=== Программа Smart Greeter ===")
+    greet_user()
+    print("Программа завершена. Хорошего дня!")
+
+if name == "main":
+>>>>>>> 96511d8226f3c632a90b367c7488329e8aa8e8ce
     main()
