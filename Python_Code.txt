@@ -1,4 +1,78 @@
 import datetime
+<<<<<<< HEAD
+from typing import Optional
+
+class SmartGreeter:
+    """Класс для интеллектуального приветствия пользователей."""
+    
+    def __init__(self):
+        self.user_name: Optional[str] = None
+        self.greeting_time = datetime.datetime.now()
+    
+    def get_time_based_greeting(self) -> str:
+        """Возвращает приветствие в зависимости от времени суток."""
+        hour = self.greeting_time.hour
+        if 5 <= hour < 12:
+            return "Доброе утро"
+        elif 12 <= hour < 18:
+            return "Добрый день"
+        elif 18 <= hour < 23:
+            return "Добрый вечер"
+        return "Доброй ночи"
+    
+    def get_season(self) -> str:
+        """Возвращает текущий сезон."""
+        month = self.greeting_time.month
+        if 3 <= month <= 5:
+            return "весны"
+        elif 6 <= month <= 8:
+            return "лета"
+        elif 9 <= month <= 11:
+            return "осени"
+        return "зимы"
+    
+    def validate_name(self, name: str) -> bool:
+        """Проверяет валидность имени."""
+        return name.isalpha() and len(name) >= 2
+    
+    def greet_user(self):
+        """Основная функция приветствия."""
+        time_greeting = self.get_time_based_greeting()
+        season = self.get_season()
+        
+        print(f"\n{'='*30}")
+        print(f"{time_greeting}! Это умный приветственник v4.0")
+        print(f"Сейчас прекрасная пора {season}!")
+        
+        while True:
+            self.user_name = input("Как вас зовут? ").strip()
+            
+            if not self.user_name:
+                print(f"{time_greeting}, аноним! Рады видеть вас!")
+                break
+                
+            if not self.validate_name(self.user_name):
+                print("Пожалуйста, введите настоящее имя (от 2 букв).")
+                continue
+                
+            print(f"{time_greeting}, {self.user_name}! Добро пожаловать!")
+            print(f"Точное время: {self.greeting_time.strftime('%H:%M:%S')}")
+            break
+
+def main():
+    """Точка входа в программу."""
+    print("=== Smart Greeter 4.0 ===")
+    print("Программа для персонализированного приветствия\n")
+    
+    greeter = SmartGreeter()
+    greeter.greet_user()
+    
+    print("\nСпасибо за использование нашей программы!")
+    print("Хорошего дня и прекрасного настроения!")
+    print("="*30)
+
+if __name__ == "__main__":
+=======
 
 def get_time_based_greeting():
     """Возвращает приветствие в зависимости от времени суток."""
@@ -35,4 +109,5 @@ def main():
     print("Программа завершена. Хорошего дня!")
 
 if name == "main":
+>>>>>>> 96511d8226f3c632a90b367c7488329e8aa8e8ce
     main()
