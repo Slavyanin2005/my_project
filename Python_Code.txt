@@ -1,113 +1,178 @@
 import datetime
-<<<<<<< HEAD
-from typing import Optional
+import random
+import json
+import os
+from typing import Optional, Dict, List
+from dataclasses import dataclass, asdict
 
-class SmartGreeter:
-    """Класс для интеллектуального приветствия пользователей."""
+@dataclass
+class UserProfile:
+    """Профиль пользователя с историей взаимодействий"""
+    name: str
+    last_visit: str
+    visit_count: int = 1
+    preferences: Optional[Dict] = None
+
+class SmartGreeterAI:
+    """AI-ассистированная система персонализированных приветствий"""
     
-    def __init__(self):
-        self.user_name: Optional[str] = None
-        self.greeting_time = datetime.datetime.now()
+    def init(self):
+        self.current_time = datetime.datetime.now()
+        self.user_db = "user_profiles.json"
+        self.user: Optional[UserProfile] = None
+        self.load_user_database()
+        
+        # ИИ-генерируемые приветствия
+        self.ai_greetings = [
+            "Великолепно видеть вас снова!",
+            "Наш день стал лучше с вашим присутствием!",
+            "Приветствую вас в нашей программе!",
+            "Какая приятная неожиданность!"
+        ]
+        
+        # Сезонные темы
+        self.seasonal_themes = {
+            "winter": ["снежинки", "горячий шоколад", "новогоднее настроение"],
+            "spring": ["цветы", "дождь", "обновление"],
+            "summer": ["солнце", "пляж", "отпуск"],
+            "autumn": ["листья", "дождь", "уют"]
+        }
+    
+    def load_user_database(self):
+        """Загружает базу данных пользователей"""
+        if not os.path.exists(self.user_db):
+            with open(self.user_db, 'w') as f:
+                json.dump([], f)
+    
+    def get_user_profile(self, name: str) -> Optional[UserProfile]:
+        """Ищет профиль пользователя в базе"""
+        with open(self.user_db, 'r') as f:
+            users = json.load(f)
+            for user in users:
+                if user['name'].lower() == name.lower():
+                    return UserProfile(**user)
+        return None
+    
+    def save_user_profile(self):
+        """Сохраняет профиль пользователя"""
+        with open(self.user_db, 'r+') as f:
+            users = json.load(f)
+            updated = False
+            for i, user in enumerate(users):
+                if user['name'].lower() == self.user.name.lower():
+                    users[i] = asdict(self.user)
+                    updated = True
+                    break
+            if not updated:
+                users.append(asdict(self.user))
+            f.seek(0)
+            json.dump(users, f, indent=4)
+            f.truncate()
     
     def get_time_based_greeting(self) -> str:
-        """Возвращает приветствие в зависимости от времени суток."""
-        hour = self.greeting_time.hour
+        """Генерирует приветствие с учетом времени суток"""
+        hour = self.current_time.hour
         if 5 <= hour < 12:
-            return "Доброе утро"
+            return "Прекрасное утро"
         elif 12 <= hour < 18:
-            return "Добрый день"
+            return "Замечательный день"
         elif 18 <= hour < 23:
-            return "Добрый вечер"
-        return "Доброй ночи"
+            return "Чудесный вечер"
+        return "Тайная ночь"
     
     def get_season(self) -> str:
-        """Возвращает текущий сезон."""
-        month = self.greeting_time.month
+        """Определяет текущий сезон"""
+        month = self.current_time.month
         if 3 <= month <= 5:
-            return "весны"
+            return "spring"
         elif 6 <= month <= 8:
-            return "лета"
+            return "summer"
         elif 9 <= month <= 11:
-            return "осени"
-        return "зимы"
+            return "autumn"
+        return "winter"
     
-    def validate_name(self, name: str) -> bool:
-        """Проверяет валидность имени."""
-        return name.isalpha() and len(name) >= 2
+    def generate_ai_comment(self) -> str:
+        """Генерирует персонализированный AI-комментарий"""
+        if not self.user:
+            return random.choice([
+                "Мы рады новым знакомствам!",
+                "Приветствуем вас впервые!"
+            ])
+        
+        if self.user.visit_count > 5:
+            return f"Наш постоянный гость ({self.user.visit_count} визитов)!"
+        elif self.user.visit_count > 1:
+            return f"Рады видеть вас снова (визит #{self.user.visit_count})!"
+        
+        return random.choice(self.ai_greetings)
+    
+    def get_seasonal_tip(self) -> str:
+        """Возвращает сезонный совет"""
+        season = self.get_season()
+        theme = random.choice(self.seasonal_themes[season])
+        tips = {
+            "winter": f"Попробуйте {theme} для настроения!",
+            "spring": f"Наслаждайтесь {theme} этого сезона!",
+            "summer": f"Не забудьте о {theme} в это время года!",
+            "autumn": f"Отличное время для {theme}!"
+        }
+        return tips[season]
+def validate_name(self, name: str) -> bool:
+        """Проверяет валидность имени"""
+        return name.isalpha() and 2 <= len(name) <= 20
     
     def greet_user(self):
-        """Основная функция приветствия."""
+        """Основной процесс приветствия"""
         time_greeting = self.get_time_based_greeting()
-        season = self.get_season()
+        season_tip = self.get_seasonal_tip()
         
-        print(f"\n{'='*30}")
-        print(f"{time_greeting}! Это умный приветственник v4.0")
-        print(f"Сейчас прекрасная пора {season}!")
+        print(f"\n{'='*40}")
+        print(f"{time_greeting}! Smart Greeter AI 5.0 приветствует вас!")
+        print(f"Совет дня: {season_tip}")
+        print("="*40)
         
         while True:
-            self.user_name = input("Как вас зовут? ").strip()
+            name = input("\nКак вас зовут? ").strip()
             
-            if not self.user_name:
-                print(f"{time_greeting}, аноним! Рады видеть вас!")
-                break
-                
-            if not self.validate_name(self.user_name):
-                print("Пожалуйста, введите настоящее имя (от 2 букв).")
+            if not name:
+                print(f"{random.choice(self.ai_greetings)} Анонимный пользователь!")
+                print("Вы можете ввести имя для персонализации")
                 continue
                 
-            print(f"{time_greeting}, {self.user_name}! Добро пожаловать!")
-            print(f"Точное время: {self.greeting_time.strftime('%H:%M:%S')}")
+            if not self.validate_name(name):
+                print("Пожалуйста, введите реальное имя (2-20 букв)")
+                continue
+                
+            self.user = self.get_user_profile(name)
+            if self.user:
+                self.user.visit_count += 1
+                self.user.last_visit = self.current_time.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                self.user = UserProfile(
+                    name=name,
+                    last_visit=self.current_time.strftime("%Y-%m-%d %H:%M:%S")
+                )
+            
+            self.save_user_profile()
             break
+        
+        ai_comment = self.generate_ai_comment()
+        print(f"\n{time_greeting}, {self.user.name}! {ai_comment}")
+        print(f"Точное время: {self.current_time.strftime('%H:%M:%S')}")
+        print(f"Дата: {self.current_time.strftime('%d.%m.%Y')}")
 
 def main():
-    """Точка входа в программу."""
-    print("=== Smart Greeter 4.0 ===")
-    print("Программа для персонализированного приветствия\n")
+    """Точка входа в программу"""
+    print("\n=== Smart Greeter AI 5.0 ===")
+    print("Интеллектуальная система персонализированных приветствий\n")
     
-    greeter = SmartGreeter()
+    greeter = SmartGreeterAI()
     greeter.greet_user()
     
-    print("\nСпасибо за использование нашей программы!")
-    print("Хорошего дня и прекрасного настроения!")
-    print("="*30)
-
-if __name__ == "__main__":
-=======
-
-def get_time_based_greeting():
-    """Возвращает приветствие в зависимости от времени суток."""
-    hour = datetime.datetime.now().hour
-    if 5 <= hour < 12:
-        return "Доброе утро"
-    elif 12 <= hour < 18:
-        return "Добрый день"
-    elif 18 <= hour < 23:
-        return "Добрый вечер"
-    else:
-        return "Доброй ночи"
-
-def greet_user():
-    """Функция приветствия пользователя с учетом времени суток."""
-    time_greeting = get_time_based_greeting()
-    print(f"{time_greeting}! Эта программа умеет здороваться.")
-    
-    user_name = input("Как тебя зовут? ").strip()
-    
-    if not user_name:
-        print(f"{time_greeting}, аноним! Добро пожаловать!")
-        return
-        
-    print(f"{time_greeting}, {user_name}! Добро пожаловать!")
-    
-    current_time = datetime.datetime.now().strftime("%H:%M")
-    print(f"Текущее время: {current_time}")
-
-def main():
-    """Основная функция программы."""
-    print("=== Программа Smart Greeter ===")
-    greet_user()
-    print("Программа завершена. Хорошего дня!")
+    print("\n" + "="*40)
+    print("Спасибо за использование нашей AI-системы!")
+    print("Хорошего дня и вдохновения!")
+    print("="*40)
 
 if name == "main":
->>>>>>> 96511d8226f3c632a90b367c7488329e8aa8e8ce
     main()
