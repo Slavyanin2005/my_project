@@ -1,4 +1,120 @@
-def validate_name(self, name: str) -> bool:
+import datetime
+import random
+import json
+import os
+from typing import Optional, Dict, List
+from dataclasses import dataclass, asdict
+
+
+@dataclass
+class UserProfile:
+    """Профиль пользователя с историей взаимодействий"""
+    name: str
+    last_visit: str
+    visit_count: int = 1
+    preferences: Optional[Dict] = None
+
+
+class SmartGreeterAI:
+    """AI-ассистированная система персонализированных приветствий"""
+
+    def __init__(self):
+        self.current_time = datetime.datetime.now()
+        self.user_db = "user_profiles.json"
+        self.user: Optional[UserProfile] = None
+        self.load_user_database()
+        self.ai_greetings = [
+            "Великолепно видеть вас снова!",
+            "Наш день стал лучше с вашим присутствием!",
+            "Приветствую вас в нашей программе!",
+            "Какая приятная неожиданность!"
+        ]
+        self.seasonal_themes = {
+            "winter": ["снежинки", "горячий шоколад", "новогоднее настроение"],
+            "spring": ["цветы", "дождь", "обновление"],
+            "summer": ["солнце", "пляж", "отпуск"],
+            "autumn": ["листья", "дождь", "уют"]
+        }
+
+    def load_user_database(self):
+        """Загружает базу данных пользователей"""
+        if not os.path.exists(self.user_db):
+            with open(self.user_db, 'w') as f:
+                json.dump([], f)
+
+    def get_user_profile(self, name: str) -> Optional[UserProfile]:
+        """Ищет профиль пользователя в базе"""
+        with open(self.user_db, 'r') as f:
+            users = json.load(f)
+            for user in users:
+                if user['name'].lower() == name.lower():
+                    return UserProfile(**user)
+        return None
+
+    def save_user_profile(self):
+        """Сохраняет профиль пользователя"""
+        with open(self.user_db, 'r+') as f:
+            users = json.load(f)
+            updated = False
+            for i, user in enumerate(users):
+                if user['name'].lower() == self.user.name.lower():
+                    users[i] = asdict(self.user)
+                    updated = True
+                    break
+            if not updated:
+                users.append(asdict(self.user))
+            f.seek(0)
+            json.dump(users, f, indent=4)
+            f.truncate()
+
+    def get_time_based_greeting(self) -> str:
+        """Генерирует приветствие с учетом времени суток"""
+        hour = self.current_time.hour
+        if 5 <= hour < 12:
+            return "Прекрасное утро"
+        elif 12 <= hour < 18:
+            return "Замечательный день"
+        elif 18 <= hour < 23:
+            return "Чудесный вечер"
+        return "Тайная ночь"
+
+    def get_season(self) -> str:
+        """Определяет текущий сезон"""
+        month = self.current_time.month
+        if 3 <= month <= 5:
+            return "spring"
+        elif 6 <= month <= 8:
+            return "summer"
+        elif 9 <= month <= 11:
+            return "autumn"
+        return "winter"
+
+    def generate_ai_comment(self) -> str:
+        """Генерирует персонализированный AI-комментарий"""
+        if not self.user:
+            return random.choice([
+                "Мы рады новым знакомствам!",
+                "Приветствуем вас впервые!"
+            ])
+        if self.user.visit_count > 5:
+            return f"Наш постоянный гость ({self.user.visit_count} визитов)!"
+        elif self.user.visit_count > 1:
+            return f"Рады видеть вас снова (визит #{self.user.visit_count})!"
+        return random.choice(self.ai_greetings)
+
+    def get_seasonal_tip(self) -> str:
+        """Возвращает сезонный совет"""
+        season = self.get_season()
+        theme = random.choice(self.seasonal_themes[season])
+        tips = {
+            "winter": f"Попробуйте {theme} для настроения!",
+            "spring": f"Наслаждайтесь {theme} этого сезона!",
+            "summer": f"Не забудьте о {theme} в это время года!",
+            "autumn": f"Отличное время для {theme}!"
+        }
+        return tips[season]
+
+    def validate_name(self, name: str) -> bool:
         """Проверяет валидность имени"""
         return name.isalpha() and 2 <= len(name) <= 20
 
@@ -48,5 +164,5 @@ def main():
     print("=" * 40)
 
 
-if name == "main":
+if __name__ == "__main__":
     main()
